@@ -2,6 +2,6 @@
 {
     public interface IFieldOperable
     {
-        void SetPotential(int id, double potential);
+        void SetPotential(int boundaryId, double potential);
     }
 }

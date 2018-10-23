@@ -1,5 +1,6 @@
 ﻿using Independence;
 using Independence.Ex;
+using Independence.EVP;
 using System;
 using System.Linq;
 
@@ -10,11 +11,12 @@ namespace DreamLifter
     /// </summary>
     public sealed class PerformanceEvaluator
     {
-        private IGEVPSolver _evpSolver;
+        private readonly IGEVPSolver _evpSolver;
+
         /// <summary>
-        /// Lifter solver, e.g., drift diffusion solver.
+        /// A drift diffusion solver.
         /// </summary>
-        private IDDESolver _lifterSolver;
+        private readonly IDDESolver _ddeSolver;
 
         /// <summary>
         /// Electric potential on a corona active electrode. 
@@ -29,32 +31,49 @@ namespace DreamLifter
         private readonly double _tol;
         private readonly double _dropFactor;
 
+        private EigenPair _eigenPair = null;
+
+        public DoubleDenseMatrix GetNormalMode(Species species)
+        {
+            var rightEigenVector = _eigenPair.RightEigenMatrix;
+            switch (species)
+            {
+                case Species.Electrons:
+                case Species.PositiveIons:
+                case Species.NegativeIons:
+                default:
+                    throw new NotImplementedException("species");
+            }
+        }
+
         /// <summary>
-        /// Initialize this evaluator with the given solver.
+        /// Initialize this evaluator with the given solvers.
         /// </summary>
-        /// <param name="lifterSolver">Lifter solver, e.g., drift diffusion solver.</param>
+        /// <param name="lifterSolver">A drift-diffusion-reaction equation solver</param>
+        /// <param name="evpSolver">A solver for generalized eigenvalue problems</param>
         /// <param name="tol"></param>
         /// <param name="dropFactor"></param>
-        public PerformanceEvaluator(IDDESolver lifterSolver, IGEVPSolver evpSolver, double tol = 1.0e-4, double dropFactor = 0.8)
+        public PerformanceEvaluator(IDDESolver ddeSolver, IGEVPSolver evpSolver, double tol = 1.0e-4, double dropFactor = 0.8)
         {
-            _lifterSolver = lifterSolver;
+            _ddeSolver = ddeSolver;
+            _evpSolver = evpSolver;
             _tol = tol;
             _dropFactor = dropFactor;
         }
 
-        public bool? Update(int id)
+        public bool? Update(int potentialBoundaryId)
         {
             var potential = _currentPotential.Value;
-            _lifterSolver.SetPotential(id, potential);
-            var J = _lifterSolver.JacobianMatrix;
-            var S = _lifterSolver.SensitivityMatrix;
-            var eigPair = _evpSolver.Solve(S, J, "SM");
-            var omega = eigPair.EigenValue.Real;
+            _ddeSolver.SetPotential(potentialBoundaryId, potential);
+            var J = _ddeSolver.GetJacobianMatrix();
+            var S = _ddeSolver.GetSensitivityMatrix();
+            _eigenPair = _evpSolver.Solve(S, J, "SM");
+            var omega = _eigenPair.EigenValue.Real;
             _hasConvergedEigenMode = Math.Abs(omega) < _tol;
             bool? IsNeutral = null;
             if (_hasConvergedEigenMode.Value)
             {
-                IsNeutral = IsStable(eigPair.RightEigenMatrix.Real());
+                IsNeutral = IsStable(_eigenPair.RightEigenMatrix.Real());
             }
             else
             {
@@ -74,7 +93,7 @@ namespace DreamLifter
         /// Judge the stability of the given mode.
         /// </summary>
         /// <param name="v">The eigenvector corresponding to the eigenmode.</param>
-        /// <returns>Is the mode stable?</returns>
+        /// <returns>Return false if the mode includes oscillation.</returns>
         private static bool IsStable(DoubleDenseMatrix v)
         {
             var max = v.Max();
