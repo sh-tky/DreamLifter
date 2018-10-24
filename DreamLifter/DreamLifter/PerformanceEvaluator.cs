@@ -49,7 +49,7 @@ namespace DreamLifter
         /// <summary>
         /// Initialize this evaluator with the given solvers.
         /// </summary>
-        /// <param name="lifterSolver">A drift-diffusion-reaction equation solver</param>
+        /// <param name="ddeSolver">A drift-diffusion-reaction equation solver</param>
         /// <param name="evpSolver">A solver for generalized eigenvalue problems</param>
         /// <param name="tol"></param>
         /// <param name="dropFactor"></param>
