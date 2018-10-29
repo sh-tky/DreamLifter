@@ -10,17 +10,17 @@ namespace DreamLifter
         /// <summary>
         /// Set potential on the node specified. 
         /// </summary>
-        /// <param name="gId">Global index of terget node</param>
+        /// <param name="boundaryName">Global name of terget node</param>
         /// <param name="value">Potential to be set</param>
-        void SetPotential(int gId, double value);
+        void SetPotential(string boundaryName, double value);
 
         /// <summary>
         /// Set gradient on the node specified.
         /// This method implements the Neumman type boundary condition.
         /// </summary>
-        /// <param name="gId">Global index of target node</param>
+        /// <param name="boundaryName">Global name of target node</param>
         /// <param name="value">Gradient to be set</param>
-        void SetGradient(int gId, double value);
+        void SetGradient(string boundaryName, double value);
 
         void SetRightHandSideVector(DoubleDenseMatrix value);
 

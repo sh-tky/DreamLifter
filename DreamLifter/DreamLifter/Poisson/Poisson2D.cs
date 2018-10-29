@@ -24,11 +24,6 @@ namespace DreamLifter.Poisson
         private Dictionary<string, double> _potentials = new Dictionary<string, double>();
 
         /// <summary>
-        /// The left hand side matrix operator.
-        /// </summary>
-        private DoubleSparseMatrix _A = null;
-
-        /// <summary>
         /// Mass matrix.
         /// </summary>
         private DoubleSparseMatrix _M = null;
@@ -49,17 +44,14 @@ namespace DreamLifter.Poisson
         private DoubleDenseMatrix _phi = null;
 
         /// <summary>
+        /// The right hand side vector.
+        /// </summary>
+        private DoubleDenseMatrix _rhs = null;
+
+        /// <summary>
         /// Relative permittivity.
         /// </summary>
         private DoubleDenseMatrix _epsilon_r = null;
-
-        public DoubleDenseMatrix FieldStrength => throw new NotImplementedException();
-
-        public DoubleSparseMatrix JacobianMatrix => _A;
-
-        public DoubleSparseMatrix MassMatrix => _M;
-
-        public DoubleSparseMatrix SensitivityMatrix => throw new NotSupportedException();
 
         public Poisson2D(IMatrixAssembler assembler, IBoundaryOperable boundary, ILinearSolver solverForMassMatrix, ILinearSolver solverForStiffnessMatrix)
         {
@@ -69,23 +61,23 @@ namespace DreamLifter.Poisson
             _solverJ = solverForStiffnessMatrix;
         }
 
-        public void Solve(DoubleDenseMatrix rhs)
+        public void Solve()
         {
             if (_solverJ == null)
             {
-                _A = _assembler.GetStiffnessMatrix(_epsilon_r);
+                var A = _assembler.GetStiffnessMatrix(_epsilon_r);
                 foreach (var boundary in _potentials)
                 {
-                    _boundary.ImposeFirstKindBoundaryCondition(_A, boundary.Key);
+                    _boundary.ImposeFirstKindBoundaryCondition(A, boundary.Key);
                 }
-                _solverJ.SetMatrix(_A);
+                _solverJ.SetMatrix(A);
             }
             if (_solverM == null)
             {
                 _M = _assembler.GetMassMatrix();
                 _solverM.SetMatrix(_M);
             }
-            var rhsVector = _M * rhs;
+            var rhsVector = _M * _rhs;
             foreach (var boundary in _potentials)
             {
                 _boundary.ImposeFirstKindBoundaryCondition(rhsVector, boundary.Key, boundary.Value);
@@ -119,19 +111,26 @@ namespace DreamLifter.Poisson
             }
         }
 
-        public void SetPotential(int gId, double value)
+        public void SetPotential(string boundaryName, double value)
         {
-            throw new NotImplementedException();
+            if (_potentials.ContainsKey(boundaryName))
+            {
+                _potentials[boundaryName] = value;
+            }
+            else
+            {
+                _potentials.Add(boundaryName, value);
+            }
         }
 
-        public void SetGradient(int gId, double value)
+        public void SetGradient(string boundaryName, double value)
         {
             throw new NotImplementedException();
         }
 
         public void SetRightHandSideVector(DoubleDenseMatrix value)
         {
-            throw new NotImplementedException();
+            _rhs = value;
         }
 
         public void SetLeftHandSideVector(DoubleDenseMatrix value)

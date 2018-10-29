@@ -1,0 +1,58 @@
+﻿using Independence;
+using Independence.Ex;
+
+namespace DreamLifter.FR.Tests.OneDimension
+{
+    /// <summary>
+    /// Implementation of a solver for 1D advection equation.
+    /// </summary>
+    public sealed class Advection1D
+    {
+        private readonly DoubleDenseMatrix _dcoef;
+        private readonly DoubleDenseMatrix _correctionFuncLeft;
+        private readonly DoubleDenseMatrix _correctionFuncRight;
+        private readonly int _numberOfElements;
+        private readonly int _numberOfSolutionPoints;
+
+        public Advection1D(MatrixProvider provider, int numberOfElements, int numberOfSolutionPoints)
+        {
+            _dcoef = provider.GetAdvectionMatrix();
+            _correctionFuncLeft = provider.GetLeftCorrectionFunc();
+            _correctionFuncRight = provider.GetRightCorrectionFunc();
+            _numberOfElements = numberOfElements;
+            _numberOfSolutionPoints = numberOfSolutionPoints;
+        }
+
+        public DoubleDenseMatrix EvaluateRHS(DoubleDenseMatrix u)
+        {
+            var yield = new DoubleDenseMatrix(_numberOfSolutionPoints, _numberOfElements);
+            for (var elem = 0; elem < _numberOfElements; elem++)
+            {
+                // compute discontinuous derivative.
+                var dfdx = _dcoef * u.SubMatrix(0, elem, _numberOfSolutionPoints - 1, elem);
+                {
+                    // left flux correction procedure.
+                    var minusElementIndex = elem == 0 ? _numberOfElements - 1 : elem - 1;
+                    var commonFluxLeftBoundary = 0.5 * (u[_numberOfSolutionPoints - 1, minusElementIndex] + u[0, elem]);
+                    var corrctionFluxLeft = commonFluxLeftBoundary - u[0, elem];
+                    for (var i = 0; i < _numberOfSolutionPoints; i++)
+                    {
+                        dfdx[i, 0] += _correctionFuncLeft[i, 0] * corrctionFluxLeft;
+                    }
+                }
+                {
+                    // right flux correction procedure.
+                    var plusElementIndex = elem == _numberOfElements - 1 ? 0 : elem + 1;
+                    var commonFluxRightBoundary = 0.5 * (u[0, plusElementIndex] + u[_numberOfSolutionPoints - 1, elem]);
+                    var corrctionFluxRight = commonFluxRightBoundary - u[_numberOfSolutionPoints - 1, elem];
+                    for (var i = 0; i < _numberOfSolutionPoints; i++)
+                    {
+                        dfdx[i, 0] += _correctionFuncRight[i, 0] * corrctionFluxRight;
+                    }
+                }
+                yield.SubMatrix(dfdx, 0, elem, _numberOfSolutionPoints - 1, elem);
+            }
+            return -yield;
+        }
+    }
+}
