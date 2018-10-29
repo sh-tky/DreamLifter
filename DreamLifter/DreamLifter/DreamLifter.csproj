@@ -71,18 +71,23 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Axis.cs" />
+    <Compile Include="IBoundaryOperable.cs" />
     <Compile Include="IDDESolver.cs" />
     <Compile Include="IFieldOperable.cs" />
     <Compile Include="IGEVPSolver.cs" />
+    <Compile Include="ILinearSolver.cs" />
     <Compile Include="IMatrixAssembler.cs" />
-    <Compile Include="IMatrixOperator.cs" />
     <Compile Include="IPoissonSolver.cs" />
+    <Compile Include="Poisson\Poisson2D.cs" />
     <Compile Include="PerformanceEvaluator.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Species.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="MatrixExpression\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

@@ -7,7 +7,7 @@ using System.Linq;
 namespace DreamLifter
 {
     /// <summary>
-    /// Evaluate the performance of given lifters.
+    /// Evaluate the performance of given EAD thruster(s).
     /// </summary>
     public sealed class PerformanceEvaluator
     {
@@ -19,12 +19,12 @@ namespace DreamLifter
         private readonly IDDESolver _ddeSolver;
 
         /// <summary>
-        /// Electric potential on a corona active electrode. 
+        /// Electric potential on corona active electrode(s).
         /// </summary>
         private double? _currentPotential = null;
 
         /// <summary>
-        /// Represent whether an electric potential is converged or not.
+        /// Represent whether the electric potential is converged or not.
         /// </summary>
         private bool? _hasConvergedEigenMode = null;
 
@@ -90,7 +90,7 @@ namespace DreamLifter
         }
 
         /// <summary>
-        /// Judge the stability of the given mode.
+        /// Judge the stability of the given eigenmode.
         /// </summary>
         /// <param name="v">The eigenvector corresponding to the eigenmode.</param>
         /// <returns>Return false if the mode includes oscillation.</returns>
