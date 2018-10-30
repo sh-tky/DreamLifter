@@ -2,6 +2,9 @@
 
 namespace DreamLifter
 {
+    /// <summary>
+    /// Insist that stability, ad-joint and sensitivity analysis are executable.
+    /// </summary>
     public interface IStabilityObservable
     {
         /// <summary>

@@ -1,6 +1,7 @@
 ﻿using Independence;
 using Independence.Ex;
 using Independence.EVP;
+using System.Collections.Generic;
 using System;
 using System.Linq;
 
@@ -17,11 +18,6 @@ namespace DreamLifter
         /// A drift diffusion solver.
         /// </summary>
         private readonly IDDESolver _ddeSolver;
-
-        /// <summary>
-        /// Electric potential on corona active electrode(s).
-        /// </summary>
-        private double? _currentPotential = null;
 
         /// <summary>
         /// Represent whether the electric potential is converged or not.
@@ -61,13 +57,24 @@ namespace DreamLifter
             _dropFactor = dropFactor;
         }
 
-        public bool? Update(int potentialBoundaryId)
+        public bool? Update(Dictionary<string, double> potentials, string perturbationTarget)
         {
-            var potential = _currentPotential.Value;
-            _ddeSolver.SetPotential(potentialBoundaryId, potential);
-            var J = _ddeSolver.GetJacobianMatrix();
-            var S = _ddeSolver.GetSensitivityMatrix();
-            _eigenPair = _evpSolver.Solve(S, J, "SM");
+            const double eps = 1.0e-4;
+            foreach (var p in potentials)
+            {
+                _ddeSolver.SetPotential(p.Key, p.Value);
+            }
+            var nominalJacobian = _ddeSolver.GetJacobianMatrix();
+            foreach (var p in potentials)
+            {
+                if (p.Key == perturbationTarget)
+                {
+                    _ddeSolver.SetPotential(p.Key, p.Value + eps);
+                }
+            }
+            var perturbedJacobian = _ddeSolver.GetJacobianMatrix();
+            var sensitivity = (perturbedJacobian - nominalJacobian) * (1.0 / eps);
+            _eigenPair = _evpSolver.Solve(sensitivity, nominalJacobian, "SM");
             var omega = _eigenPair.EigenValue.Real;
             _hasConvergedEigenMode = Math.Abs(omega) < _tol;
             bool? IsNeutral = null;
@@ -77,13 +84,13 @@ namespace DreamLifter
             }
             else
             {
-                _currentPotential = potential - omega;
+                potentials[perturbationTarget] -= omega;
             }
             if (IsNeutral.HasValue)
             {
                 if (!IsNeutral.Value)
                 {
-                    _currentPotential = _dropFactor * potential;
+                    potentials[perturbationTarget] *= _dropFactor;
                 }
             }
             return IsNeutral;
