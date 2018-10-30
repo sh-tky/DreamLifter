@@ -10,6 +10,9 @@ namespace DreamLifter.FR
         private DoubleDenseMatrix _coordinates;
         private readonly int _polynomialOrder;
 
+        /// <summary>
+        /// Return the coordinates of internal nodes.
+        /// </summary>
         public DoubleDenseMatrix Coord => _coordinates;
 
         public MatrixProvider(int polynomialOrder)
@@ -38,7 +41,7 @@ namespace DreamLifter.FR
             }
         }
 
-        public DoubleDenseMatrix GetAdvectionMatrix()
+        public DoubleDenseMatrix GetLocalAdvectionMatrix()
         {
             if (_differentiate == null)
             {

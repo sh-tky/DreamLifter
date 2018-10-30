@@ -1,4 +1,5 @@
 ﻿using Independence;
+using System;
 
 namespace DreamLifter
 {
@@ -28,5 +29,7 @@ namespace DreamLifter
         /// <param name="diffusivity">Set the diffusivity vector.</param>
         /// <returns></returns>
         DoubleSparseMatrix GetStiffnessMatrix(DoubleDenseMatrix diffusivity);
+
+        DoubleSparseMatrix GetAdvectionMatrix(Func<DoubleDenseMatrix, Axis> velocityHandler);
     }
 }

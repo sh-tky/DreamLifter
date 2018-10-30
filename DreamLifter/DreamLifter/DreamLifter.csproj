@@ -5,7 +5,7 @@
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{70419221-EBAC-4FEF-BA6A-68A39CDF7E52}</ProjectGuid>
-    <OutputType>Library</OutputType>
+    <OutputType>Exe</OutputType>
     <RootNamespace>DreamLifter</RootNamespace>
     <AssemblyName>DreamLifter</AssemblyName>
     <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
@@ -74,6 +74,7 @@
     <Compile Include="Executable\MainEngine.cs" />
     <Compile Include="FR\MatrixProvider.cs" />
     <Compile Include="FR\Polynomials.cs" />
+    <Compile Include="FR\TwoDimension\FRUniformMatrixAssembler.cs" />
     <Compile Include="IBoundaryOperable.cs" />
     <Compile Include="IDDESolver.cs" />
     <Compile Include="IFieldOperable.cs" />
@@ -86,13 +87,11 @@
     <Compile Include="PerformanceEvaluator.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Species.cs" />
-    <Compile Include="Tests\OneDimension\Advection1D.cs" />
+    <Compile Include="FR\Tests\Advection1D.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="FR\TwoDimension\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

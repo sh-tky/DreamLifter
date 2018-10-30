@@ -1,7 +1,7 @@
 ﻿using Independence;
 using Independence.Ex;
 
-namespace DreamLifter.FR.Tests.OneDimension
+namespace DreamLifter.FR.Tests
 {
     /// <summary>
     /// Implementation of a solver for 1D advection equation.
@@ -16,7 +16,7 @@ namespace DreamLifter.FR.Tests.OneDimension
 
         public Advection1D(MatrixProvider provider, int numberOfElements, int numberOfSolutionPoints)
         {
-            _dcoef = provider.GetAdvectionMatrix();
+            _dcoef = provider.GetLocalAdvectionMatrix();
             _correctionFuncLeft = provider.GetLeftCorrectionFunc();
             _correctionFuncRight = provider.GetRightCorrectionFunc();
             _numberOfElements = numberOfElements;
@@ -26,15 +26,15 @@ namespace DreamLifter.FR.Tests.OneDimension
         public DoubleDenseMatrix EvaluateRHS(DoubleDenseMatrix u)
         {
             var yield = new DoubleDenseMatrix(_numberOfSolutionPoints, _numberOfElements);
-            for (var elem = 0; elem < _numberOfElements; elem++)
+            for (var k = 0; k < _numberOfElements; k++)
             {
                 // compute discontinuous derivative.
-                var dfdx = _dcoef * u.SubMatrix(0, elem, _numberOfSolutionPoints - 1, elem);
+                var dfdx = _dcoef * u.SubMatrix(0, k, _numberOfSolutionPoints - 1, k);
                 {
                     // left flux correction procedure.
-                    var minusElementIndex = elem == 0 ? _numberOfElements - 1 : elem - 1;
-                    var commonFluxLeftBoundary = 0.5 * (u[_numberOfSolutionPoints - 1, minusElementIndex] + u[0, elem]);
-                    var corrctionFluxLeft = commonFluxLeftBoundary - u[0, elem];
+                    var minusElementIndex = k == 0 ? _numberOfElements - 1 : k - 1;
+                    var commonFluxLeftBoundary = 0.5 * (u[_numberOfSolutionPoints - 1, minusElementIndex] + u[0, k]);
+                    var corrctionFluxLeft = commonFluxLeftBoundary - u[0, k];
                     for (var i = 0; i < _numberOfSolutionPoints; i++)
                     {
                         dfdx[i, 0] += _correctionFuncLeft[i, 0] * corrctionFluxLeft;
@@ -42,15 +42,15 @@ namespace DreamLifter.FR.Tests.OneDimension
                 }
                 {
                     // right flux correction procedure.
-                    var plusElementIndex = elem == _numberOfElements - 1 ? 0 : elem + 1;
-                    var commonFluxRightBoundary = 0.5 * (u[0, plusElementIndex] + u[_numberOfSolutionPoints - 1, elem]);
-                    var corrctionFluxRight = commonFluxRightBoundary - u[_numberOfSolutionPoints - 1, elem];
+                    var plusElementIndex = k == _numberOfElements - 1 ? 0 : k + 1;
+                    var commonFluxRightBoundary = 0.5 * (u[0, plusElementIndex] + u[_numberOfSolutionPoints - 1, k]);
+                    var corrctionFluxRight = commonFluxRightBoundary - u[_numberOfSolutionPoints - 1, k];
                     for (var i = 0; i < _numberOfSolutionPoints; i++)
                     {
                         dfdx[i, 0] += _correctionFuncRight[i, 0] * corrctionFluxRight;
                     }
                 }
-                yield.SubMatrix(dfdx, 0, elem, _numberOfSolutionPoints - 1, elem);
+                yield.SubMatrix(dfdx, 0, k, _numberOfSolutionPoints - 1, k);
             }
             return -yield;
         }
