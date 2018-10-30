@@ -72,6 +72,7 @@
   <ItemGroup>
     <Compile Include="Axis.cs" />
     <Compile Include="Executable\MainEngine.cs" />
+    <Compile Include="FDM\TwoDimension\FDMUniformMatrixAssembler.cs" />
     <Compile Include="FR\MatrixProvider.cs" />
     <Compile Include="FR\Polynomials.cs" />
     <Compile Include="FR\TwoDimension\FRUniformMatrixAssembler.cs" />

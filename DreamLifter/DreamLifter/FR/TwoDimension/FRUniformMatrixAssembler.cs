@@ -17,15 +17,15 @@ namespace DreamLifter.FR.TwoDimension
     {
         private readonly int _numberOfElements;
         private readonly int _numberOfSolutionPoints;
-        private readonly MatrixProvider _matrixProvider;
+        private readonly MatrixProvider _localMatrixProvider;
         private readonly DoubleDenseMatrix _dcoef;
 
         public FRUniformMatrixAssembler(int numberOfElements, int polynomialOrder)
         {
             _numberOfElements = numberOfElements;
             _numberOfSolutionPoints = polynomialOrder + 1;
-            _matrixProvider = new MatrixProvider(polynomialOrder);
-            _dcoef = _matrixProvider.GetLocalAdvectionMatrix();
+            _localMatrixProvider = new MatrixProvider(polynomialOrder);
+            _dcoef = _localMatrixProvider.GetLocalAdvectionMatrix();
         }
 
         public DoubleSparseMatrix GetAdvectionMatrix(Func<DoubleDenseMatrix, Axis> velocityHandler)
