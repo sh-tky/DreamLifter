@@ -72,6 +72,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Axis.cs" />
+    <Compile Include="Elements\Element.cs" />
+    <Compile Include="Elements\Node.cs" />
     <Compile Include="Executable\MainEngine.cs" />
     <Compile Include="FDM\TwoDimension\FDMUniformMatrixAssembler.cs" />
     <Compile Include="FR\MatrixProvider.cs" />
@@ -85,7 +87,9 @@
     <Compile Include="IMatrixAssembler.cs" />
     <Compile Include="IPoissonSolver.cs" />
     <Compile Include="IStabilityObservable.cs" />
-    <Compile Include="Poisson\Poisson2D.cs" />
+    <Compile Include="MatrixMarket\INumericalIntegration.cs" />
+    <Compile Include="MatrixMarket\QuadIntegrator.cs" />
+    <Compile Include="Poisson\PoissonBase.cs" />
     <Compile Include="PerformanceEvaluator.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Species.cs" />

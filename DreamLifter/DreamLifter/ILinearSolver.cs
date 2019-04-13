@@ -8,7 +8,7 @@ namespace DreamLifter
     public interface ILinearSolver
     {
         /// <summary>
-        /// Set a matrix which is to be factorized.
+        /// Set a matrix to this solver (shallow copy)
         /// </summary>
         void SetMatrix(DoubleSparseMatrix matrix);
 

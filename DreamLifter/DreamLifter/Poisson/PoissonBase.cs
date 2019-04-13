@@ -8,7 +8,7 @@ namespace DreamLifter.Poisson
     /// <summary>
     /// A solver for the Poisson equation.
     /// </summary>
-    public sealed class Poisson2D : IPoissonSolver
+    public abstract class PoissonBase
     {
         /// <summary>
         /// An assembler for matrices.
@@ -29,16 +29,6 @@ namespace DreamLifter.Poisson
         private DoubleSparseMatrix _M = null;
 
         /// <summary>
-        /// An operator matrix to derive the electric field in X-direction from the scalar potential.
-        /// </summary>
-        private DoubleSparseMatrix _HxT = null;
-
-        /// <summary>
-        /// An operator matrix to derive the electric field in Y-direction from the scalar potential.
-        /// </summary>
-        private DoubleSparseMatrix _HyT = null;
-
-        /// <summary>
         /// Electric scalar potential.
         /// </summary>
         private DoubleDenseMatrix _phi = null;
@@ -51,9 +41,9 @@ namespace DreamLifter.Poisson
         /// <summary>
         /// Relative permittivity.
         /// </summary>
-        private DoubleDenseMatrix _epsilon_r = null;
+        private DoubleDenseMatrix _epsilonR = null;
 
-        public Poisson2D(IMatrixAssembler assembler, IBoundaryOperable boundary, ILinearSolver solverForMassMatrix, ILinearSolver solverForStiffnessMatrix)
+        public PoissonBase(IMatrixAssembler assembler, IBoundaryOperable boundary, ILinearSolver solverForMassMatrix, ILinearSolver solverForStiffnessMatrix)
         {
             _assembler = assembler;
             _boundary = boundary;
@@ -65,7 +55,7 @@ namespace DreamLifter.Poisson
         {
             if (_solverJ == null)
             {
-                var A = _assembler.GetStiffnessMatrix(_epsilon_r);
+                var A = _assembler.GetStiffnessMatrix(_epsilonR);
                 foreach (var boundary in _potentials)
                 {
                     _boundary.ImposeFirstKindBoundaryCondition(A, boundary.Key);
@@ -90,26 +80,7 @@ namespace DreamLifter.Poisson
             get { return _phi; }
         }
 
-        public DoubleDenseMatrix GetVectorField(Axis axis)
-        {
-            if (_HxT == null)
-            {
-                _HxT = _assembler.GetDifferentialMatrix(Axis.X);
-            }
-            if (_HyT == null)
-            {
-                _HyT = _assembler.GetDifferentialMatrix(Axis.Y);
-            }
-            switch (axis)
-            {
-                case Axis.X:
-                    return -(_solverM.Solve(_HxT * _phi));
-                case Axis.Y:
-                    return -(_solverM.Solve(_HyT * _phi));
-                default:
-                    throw new ArgumentOutOfRangeException("axis");
-            }
-        }
+        public abstract DoubleDenseMatrix GetVectorField(Axis axis);
 
         public void SetPotential(string boundaryName, double value)
         {
@@ -123,11 +94,6 @@ namespace DreamLifter.Poisson
             }
         }
 
-        public void SetGradient(string boundaryName, double value)
-        {
-            throw new NotImplementedException();
-        }
-
         public void SetRightHandSideVector(DoubleDenseMatrix value)
         {
             _rhs = value;
@@ -135,7 +101,7 @@ namespace DreamLifter.Poisson
 
         public void SetLeftHandSideVector(DoubleDenseMatrix value)
         {
-            _epsilon_r = value;
+            _epsilonR = value;
         }
 
         public DoubleDenseMatrix GetScalarPotential()
