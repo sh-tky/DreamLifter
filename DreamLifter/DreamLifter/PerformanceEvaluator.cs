@@ -10,21 +10,11 @@ namespace DreamLifter
     /// </summary>
     public sealed class PerformanceEvaluator
     {
-        private IGEVPSolver _evpSolver;
+        private IGEVPSolver _gevpSolver;
         /// <summary>
         /// Lifter solver, e.g., drift diffusion solver.
         /// </summary>
         private IDDESolver _lifterSolver;
-
-        /// <summary>
-        /// Electric potential on a corona active electrode. 
-        /// </summary>
-        private double? _currentPotential = null;
-
-        /// <summary>
-        /// Represent whether an electric potential is converged or not.
-        /// </summary>
-        private bool? _hasConvergedEigenMode = null;
 
         private readonly double _tol;
         private readonly double _dropFactor;
@@ -42,29 +32,25 @@ namespace DreamLifter
             _dropFactor = dropFactor;
         }
 
-        public bool? Update(int id)
+        public bool? Update(int id, ref double potential)
         {
-            var potential = _currentPotential.Value;
             _lifterSolver.SetPotential(id, potential);
-            var J = _lifterSolver.JacobianMatrix;
-            var S = _lifterSolver.SensitivityMatrix;
-            var eigPair = _evpSolver.Solve(S, J, "SM");
+            var eigPair = _gevpSolver.Solve(_lifterSolver.SensitivityMatrix, _lifterSolver.JacobianMatrix, "SM");
             var omega = eigPair.EigenValue.Real;
-            _hasConvergedEigenMode = Math.Abs(omega) < _tol;
             bool? IsNeutral = null;
-            if (_hasConvergedEigenMode.Value)
+            if (Math.Abs(omega) < _tol)
             {
                 IsNeutral = IsStable(eigPair.RightEigenMatrix.Real());
             }
             else
             {
-                _currentPotential = potential - omega;
+                potential -= omega;
             }
             if (IsNeutral.HasValue)
             {
                 if (!IsNeutral.Value)
                 {
-                    _currentPotential = _dropFactor * potential;
+                    potential *= _dropFactor;
                 }
             }
             return IsNeutral;
