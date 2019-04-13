@@ -1,7 +1,10 @@
 ﻿namespace DreamLifter
 {
+    /// <summary>
+    /// Insist that the electric field is operable. 
+    /// </summary>
     public interface IFieldOperable
     {
-        void SetPotential(int id, double potential);
+        void SetPotential(string boundaryName, double potential);
     }
 }

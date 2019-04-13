@@ -8,11 +8,10 @@
     <OutputType>Exe</OutputType>
     <RootNamespace>DreamLifter</RootNamespace>
     <AssemblyName>DreamLifter</AssemblyName>
-    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <Deterministic>true</Deterministic>
-    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -53,6 +52,9 @@
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
     <Prefer32Bit>true</Prefer32Bit>
   </PropertyGroup>
+  <PropertyGroup>
+    <StartupObject />
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="IndependenceSharp">
       <HintPath>..\..\..\Independence\Independence\IndependenceSharp\bin\x64\Release\IndependenceSharp.dll</HintPath>
@@ -69,23 +71,28 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Axis.cs" />
-    <Compile Include="DriftDiffusion\DriftDiffusionBase.cs" />
+    <Compile Include="Executable\MainEngine.cs" />
+    <Compile Include="FDM\TwoDimension\FDMUniformMatrixAssembler.cs" />
+    <Compile Include="FR\MatrixProvider.cs" />
+    <Compile Include="FR\Polynomials.cs" />
+    <Compile Include="FR\TwoDimension\FRUniformMatrixAssembler.cs" />
+    <Compile Include="IBoundaryOperable.cs" />
     <Compile Include="IDDESolver.cs" />
     <Compile Include="IFieldOperable.cs" />
     <Compile Include="IGEVPSolver.cs" />
+    <Compile Include="ILinearSolver.cs" />
     <Compile Include="IMatrixAssembler.cs" />
-    <Compile Include="IMatrixOperator.cs" />
+    <Compile Include="IPoissonSolver.cs" />
+    <Compile Include="IStabilityObservable.cs" />
+    <Compile Include="Poisson\Poisson2D.cs" />
     <Compile Include="PerformanceEvaluator.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Species.cs" />
+    <Compile Include="FR\Tests\Advection1D.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="MatrixMarket\CGFEM1D\" />
-  </ItemGroup>
-  <ItemGroup>
-    <WCFMetadata Include="Connected Services\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
