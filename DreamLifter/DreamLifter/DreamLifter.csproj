@@ -87,8 +87,11 @@
     <Compile Include="IMatrixAssembler.cs" />
     <Compile Include="IPoissonSolver.cs" />
     <Compile Include="IStabilityObservable.cs" />
+    <Compile Include="MatrixMarket\IntegralFunction2D.cs" />
     <Compile Include="MatrixMarket\INumericalIntegration.cs" />
+    <Compile Include="MatrixMarket\QuadIntegralFunction.cs" />
     <Compile Include="MatrixMarket\QuadIntegrator.cs" />
+    <Compile Include="MatrixMarket\ShapeFunctionBase.cs" />
     <Compile Include="Poisson\PoissonBase.cs" />
     <Compile Include="PerformanceEvaluator.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

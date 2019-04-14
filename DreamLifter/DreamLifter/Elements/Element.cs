@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using Independence;
+using DreamLifter.MatrixMarket;
 
 namespace DreamLifter.Elements
 {
@@ -35,6 +36,12 @@ namespace DreamLifter.Elements
         public int GetHashCode(Element obj)
         {
             return obj.Number;
+        }
+
+        public ShapeFunctionBase Shape
+        {
+            get;
+            protected set;
         }
 
         public int Number { get; private set; }
